@@ -125,29 +125,32 @@ a{color:var(--gold);text-decoration:none}
 .chint{font-size:12px;color:var(--dim2);margin-top:8px;display:flex;justify-content:space-between;align-items:center}
 /* ── CHAT INPUT ── */
 .cbot{padding:14px 18px 18px;background:var(--sur);border-top:1px solid var(--bor);flex-shrink:0}
-.cwrap{background:var(--bg);border:1.5px solid var(--bor);border-radius:18px;padding:14px 16px;transition:all .22s;box-shadow:0 2px 16px rgba(0,0,0,.18)}
-.cwrap:focus-within{border-color:rgba(74,158,255,.6);box-shadow:0 2px 22px rgba(74,158,255,.15)}
+.cwrap{background:var(--sur2);border:1.5px solid var(--bor);border-radius:16px;padding:14px 16px;transition:border-color .22s}
+.cwrap:focus-within{border-color:var(--gold-border)}
 .cin{width:100%;background:none;border:none;outline:none;font-size:16px;color:var(--text);resize:none;min-height:120px;max-height:360px;line-height:1.65;display:block;text-align:center}
 .cin:not(:placeholder-shown){text-align:left}
 .cin::placeholder{color:var(--dim2)}
-/* Send button */
-.sndbtn{width:48px;height:48px;background:linear-gradient(135deg,#4a9eff,#9b7ff5);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;border:none;box-shadow:0 4px 16px rgba(74,158,255,.4);cursor:pointer;transition:all .2s;flex-shrink:0}
-.sndbtn:hover{transform:scale(1.07);box-shadow:0 6px 20px rgba(74,158,255,.5)}
-.sndbtn:disabled{background:var(--sur3);color:var(--dim);box-shadow:none;transform:none}
-.chat-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
-/* Floating mic */
-#float-mic{position:fixed;bottom:130px;right:20px;z-index:9999;touch-action:none;user-select:none}
-.mic-wrap{position:relative;width:68px;height:68px;display:flex;align-items:center;justify-content:center}
-.micbtn{width:68px;height:68px;background:linear-gradient(145deg,#2a5298,#1a3a6e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;line-height:1;border:2.5px solid rgba(100,160,255,.7);cursor:pointer;position:relative;z-index:2;animation:balloonFloat 3.5s ease-in-out infinite;box-shadow:0 8px 28px rgba(74,158,255,.45),0 0 0 0 rgba(74,158,255,.3);transition:background .2s,border-color .2s}
-.micbtn.rec{background:linear-gradient(145deg,#8b0000,#cc0000);border-color:rgba(255,100,100,.8);box-shadow:0 8px 28px rgba(255,80,80,.5);animation:none}
-@keyframes balloonFloat{0%,100%{transform:translateY(0) rotate(-1deg) scale(1)}40%{transform:translateY(-10px) rotate(2deg) scale(1.04)}70%{transform:translateY(-5px) rotate(0) scale(1.01)}}
-.mic-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(255,80,80,.6);opacity:0;pointer-events:none;display:none}
+/* Action buttons — all same height 38px, same gold accent */
+.chat-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px}
+.sndbtn{height:38px;padding:0 18px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;gap:6px;color:#0c0e16;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .18s;flex-shrink:0}
+.sndbtn:hover{background:#e8b94d}
+.sndbtn:disabled{background:var(--sur3);color:var(--dim)}
+.say-btn{height:38px;width:38px;background:var(--sur3);border:1px solid var(--bor);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .18s;color:var(--dim);flex-shrink:0}
+.say-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+/* Floating mic — only on Alex */
+#float-mic{position:fixed;bottom:140px;right:22px;z-index:9999;touch-action:none;user-select:none;display:none}
+.mic-wrap{position:relative;width:62px;height:62px;display:flex;align-items:center;justify-content:center}
+.micbtn{width:62px;height:62px;background:var(--sur2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1;border:2px solid var(--gold-border);cursor:pointer;position:relative;z-index:2;animation:balloonFloat 3.5s ease-in-out infinite;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:background .2s,border-color .2s}
+.micbtn:hover{background:var(--sur3);border-color:var(--gold)}
+.micbtn.rec{background:var(--rdd);border-color:var(--red);animation:none}
+@keyframes balloonFloat{0%,100%{transform:translateY(0) rotate(-1deg)}45%{transform:translateY(-10px) rotate(2deg)}75%{transform:translateY(-5px) rotate(0)}}
+.mic-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(255,80,80,.5);opacity:0;pointer-events:none;display:none}
 .mic-wrap.active .mic-ring{display:block}
 .mic-ring.r1{animation:micRing 1.8s ease-out infinite}
 .mic-ring.r2{animation:micRing 1.8s ease-out .6s infinite}
 .mic-ring.r3{animation:micRing 1.8s ease-out 1.2s infinite}
-@keyframes micRing{0%{transform:scale(1);opacity:.6}100%{transform:scale(3.2);opacity:0}}
-.mic-label{display:none;position:absolute;top:-32px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:11px;padding:4px 10px;border-radius:10px;white-space:nowrap;font-weight:700}
+@keyframes micRing{0%{transform:scale(1);opacity:.55}100%{transform:scale(3.2);opacity:0}}
+.mic-label{display:none;position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:11px;padding:3px 9px;border-radius:8px;white-space:nowrap;font-weight:700}
 .mic-wrap.active .mic-label{display:block}
 /* Floating draggable mic */
 45%{transform:translateY(-10px) rotate(2deg)}75%{transform:translateY(-5px) rotate(0deg)}}
@@ -532,10 +535,8 @@ a{color:var(--gold);text-decoration:none}
           <textarea class="cin" id="cin" placeholder="İngilizce yaz..." rows="1" onkeydown="chatKey(event)" oninput="autoH(this)"></textarea>
         </div>
         <div class="chat-actions">
-          <button class="icbtn" onclick="sayLast()" style="width:30px;height:30px;font-size:14px;">🔊</button>
-          <button class="sndbtn" id="sndbtn" onclick="sendMsg()" title="Gönder">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
+          <button class="say-btn" onclick="sayLast()" title="Son mesajı seslendir">🔊</button>
+          <button class="sndbtn" id="sndbtn" onclick="sendMsg()">Gönder ➤</button>
         </div>
         <div class="chint"><span>Enter ile gönder · Shift+Enter yeni satır</span></div>
       </div>
@@ -1001,6 +1002,9 @@ function go(id){
   document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('act'));
   document.getElementById('s-'+id).classList.add('act');
   document.querySelector(`[data-s="${id}"]`).classList.add('act');
+  // Show mic only on Alex
+  const fm=document.getElementById('float-mic');
+  if(fm) fm.style.display=id==='alex'?'block':'none';
   closePopup();
   if(id==='hub')refreshHub();
   if(id==='vocab'){renderVL();checkVState();}
@@ -2178,36 +2182,49 @@ function renderShadList(){
 
 // ═══════════ MIC / SPEECH RECOGNITION ═══════════
 let micRecognition=null;let micActive=false;
-function toggleMic(){
-  if(location.protocol==='file:'){
-    showMicWarning('Mikrofon yerel dosyada çalışmaz. GitHub Pages veya Netlify\'e yükleyince aktif olur.');return;
-  }
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    showMicWarning('Tarayıcın mikrofonu desteklemiyor. Chrome kullan.');return;
-  }
-  if(micActive){micRecognition?.stop();return;}
+function _initMicRecognition(){
+  if(location.protocol==='file:'){showMicWarning('Mikrofon yerel dosyada çalışmaz. GitHub Pages\'e yükleyince aktif olur.');return false;}
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){showMicWarning('Chrome gerekli.');return false;}
+  return true;
+}
+function startMic(e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  if(_micMoved||micActive) return;
+  if(!_initMicRecognition()) return;
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   micRecognition=new SR();
-  micRecognition.lang='en-US';micRecognition.continuous=false;micRecognition.interimResults=true;
+  micRecognition.lang='en-US';micRecognition.continuous=true;micRecognition.interimResults=true;
   micRecognition.onstart=()=>{
     micActive=true;
     document.getElementById('micbtn').classList.add('rec');
     document.getElementById('mic-wrap').classList.add('active');
-    document.getElementById('cin').placeholder='🎙 Dinleniyor...';
+    document.getElementById('cin').value='';
+    document.getElementById('cin').placeholder='🎙 Konuş...';
     hideMicWarning();
   };
-  micRecognition.onresult=(e)=>{
-    let txt='';for(let i=0;i<e.results.length;i++)txt+=e.results[i][0].transcript;
+  micRecognition.onresult=(ev)=>{
+    let txt='';for(let i=0;i<ev.results.length;i++)txt+=ev.results[i][0].transcript;
     document.getElementById('cin').value=txt;autoH(document.getElementById('cin'));
   };
-  micRecognition.onerror=(e)=>{
-    const msgs={'not-allowed':'Mikrofon izni reddedildi. Adres çubuğu → 🔒 → Mikrofon → İzin Ver → sayfayı yenile.','audio-capture':'Mikrofon bulunamadı.','network':'Ağ hatası.'};
-    if(msgs[e.error])showMicWarning(msgs[e.error]);
+  micRecognition.onerror=(ev)=>{
+    const msgs={'not-allowed':'Mikrofon izni reddedildi → Adres çubuğu 🔒 → İzin Ver → yenile.','audio-capture':'Mikrofon bulunamadı.','network':'Ağ hatası.'};
+    if(msgs[ev.error])showMicWarning(msgs[ev.error]);
     stopMic();
   };
-  micRecognition.onend=()=>{stopMic();};
-  try{micRecognition.start();}catch(e){showMicWarning('Mikrofon başlatılamadı.');stopMic();}
+  micRecognition.onend=()=>stopMic();
+  try{micRecognition.start();}catch(e){showMicWarning('Başlatılamadı.');stopMic();}
 }
+function stopMicAndSend(e){
+  if(e){e.preventDefault();e.stopPropagation();}
+  if(!micActive) return;
+  micRecognition?.stop();
+  setTimeout(()=>{
+    const val=document.getElementById('cin').value.trim();
+    if(val) sendMsg();
+  },400);
+}
+function toggleMic(){startMic();}
+
 function showMicWarning(msg){
   let el=document.getElementById('mic-warn');
   if(!el){
@@ -2716,6 +2733,9 @@ document.addEventListener('click',e=>{
 // ═══════════ INIT ═══════════
 load();
 loadAnnotations();
+// Hide mic initially (only shown on Alex)
+const _fm=document.getElementById('float-mic');
+if(_fm)_fm.style.display='none';
 renderLearningPath();
 // Update toggle visuals
 const tog=document.getElementById('autoplay-tog');
@@ -2747,7 +2767,10 @@ if(S.keys.groq)document.getElementById('key-tip').style.display='none';
     <div class="mic-ring r2"></div>
     <div class="mic-ring r3"></div>
     <div class="mic-label">Dinleniyor</div>
-    <button class="micbtn" id="micbtn" onclick="handleMicClick()" title="Sesli konuş · Sürükle taşı">🎙</button>
+    <button class="micbtn" id="micbtn" 
+      onmousedown="startMic(event)" onmouseup="stopMicAndSend(event)"
+      ontouchstart="startMic(event)" ontouchend="stopMicAndSend(event)"
+      title="Bas konuş bırak gönder">🎙</button>
   </div>
 </div>
 
@@ -2794,12 +2817,10 @@ if(S.keys.groq)document.getElementById('key-tip').style.display='none';
 })();
 
 let _micMoved=false;
-document.getElementById('float-mic').addEventListener('touchstart',()=>{_micMoved=false;},{passive:true});
-document.getElementById('float-mic').addEventListener('touchmove',()=>{_micMoved=true;},{passive:true});
-
-function handleMicClick(){
-  if(_micMoved){_micMoved=false;return;}
-  toggleMic();
+const _fmEl=document.getElementById('float-mic');
+if(_fmEl){
+  _fmEl.addEventListener('touchstart',()=>{_micMoved=false;},{passive:true});
+  _fmEl.addEventListener('touchmove',()=>{_micMoved=true;},{passive:true});
 }
 </script>
 
