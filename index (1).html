@@ -992,12 +992,10 @@ a{color:var(--gold);text-decoration:none}
             <div style="font-size:18px;color:var(--text)" id="df-rev-meaning"></div>
           </div>
         </div>
-        <div id="df-rev-btns" style="display:none;width:100%;max-width:500px">
-          <div style="display:flex;gap:10px;margin-bottom:10px">
-            <button onclick="dfRate(1)" style="flex:1;padding:14px;background:var(--rdd);border:1px solid rgba(255,107,107,.3);border-radius:var(--r2);color:var(--red);font-size:15px;cursor:pointer;transition:all .18s">😰<br><span style="font-size:12px">Unuttum</span></button>
-            <button onclick="dfRate(3)" style="flex:1;padding:14px;background:var(--sur2);border:1px solid var(--bor);border-radius:var(--r2);font-size:15px;cursor:pointer;transition:all .18s">🤔<br><span style="font-size:12px">Zorlandım</span></button>
-            <button onclick="dfRate(5)" style="flex:1;padding:14px;background:var(--gnd);border:1px solid rgba(82,196,122,.3);border-radius:var(--r2);color:var(--grn);font-size:15px;cursor:pointer;transition:all .18s">✓<br><span style="font-size:12px">Bildim!</span></button>
-          </div>
+        <div id="df-rev-btns" style="display:none;gap:10px;width:100%;max-width:500px">
+          <button onclick="dfRate(1)" style="flex:1;padding:14px;background:var(--rdd);border:1px solid rgba(255,107,107,.3);border-radius:var(--r2);color:var(--red);font-size:14px;cursor:pointer">😰 Unuttum</button>
+          <button onclick="dfRate(3)" style="flex:1;padding:14px;background:var(--sur2);border:1px solid var(--bor);border-radius:var(--r2);font-size:14px;cursor:pointer">🤔 Zorlandım</button>
+          <button onclick="dfRate(5)" style="flex:1;padding:14px;background:var(--gnd);border:1px solid rgba(82,196,122,.3);border-radius:var(--r2);color:var(--grn);font-size:14px;cursor:pointer">✓ Bildim!</button>
         </div>
         <div id="df-rev-done" style="display:none;text-align:center">
           <div style="font-size:48px;margin-bottom:16px">🎉</div>
@@ -2941,18 +2939,16 @@ function dfRenderList(filter=''){
   body.innerHTML=words.map(w=>{
     const isDue=w.due<=now;
     const days=Math.max(0,Math.ceil((w.due-now)/86400000));
-    const flower=dfGetFlower(w.interval);
     return`<div style="display:flex;align-items:center;padding:10px 18px;border-bottom:1px solid var(--bor);gap:10px">
-      <div style="font-size:22px;flex-shrink:0" title="${flower.label}">${flower.emoji}</div>
-      <div style="flex:1;min-width:0">
+      <div style="flex:1">
         <div style="font-weight:500;font-size:14px">${w.word}</div>
-        <div style="font-size:12px;color:var(--dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.meaning}</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:2px">${w.meaning}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-size:11px;${isDue?'color:var(--red)':'color:var(--dim)'}">${isDue?'⏰ Bugün':'📅 '+days+'g'}</div>
-        <div style="font-size:11px;color:${flower.color};margin-top:2px">${flower.label}</div>
+        <div style="font-size:11px;color:var(--dim2);margin-top:2px">${w.interval}g aralık</div>
       </div>
-      <button onclick="dfDelete('${w.id}')" style="font-size:14px;color:var(--dim);background:none;border:none;cursor:pointer;padding:4px;flex-shrink:0">🗑</button>
+      <button onclick="dfDelete('${w.id}')" style="font-size:14px;color:var(--dim);background:none;border:none;cursor:pointer;padding:4px">🗑</button>
     </div>`;
   }).join('');
 }
@@ -3003,27 +2999,19 @@ function parseFile(file){
 }
 
 function parseCSV(text){
-  // Detect delimiter
-  const firstLine=text.split('\n')[0]||'';
-  const delim=firstLine.includes('\t')?'\t':firstLine.includes(';')?';':',';
   const lines=text.split('\n').filter(l=>l.trim());
   let added=0,skipped=0;
   lines.forEach((line,i)=>{
-    // Skip header row
-    if(i===0){
-      const low=line.toLowerCase();
-      if(low.includes('kelime')||low.includes('word')||low.includes('english')||low.includes('term'))return;
-    }
-    const parts=line.split(delim).map(p=>p.trim().replace(/^["']|["']$/g,''));
-    const word=parts[0]||'';const meaning=parts[1]||'';
-    if(word&&meaning){
-      if(!dfWords.find(w=>w.word.toLowerCase()===word.toLowerCase())){
-        dfWords.push(dfNewWord(word,meaning));added++;
+    if(i===0&&(line.toLowerCase().includes('kelime')||line.toLowerCase().includes('word')))return;
+    const parts=line.split(/[,;\t]/).map(p=>p.trim().replace(/^"|"$/g,''));
+    if(parts.length>=2&&parts[0]&&parts[1]){
+      if(!dfWords.find(w=>w.word.toLowerCase()===parts[0].toLowerCase())){
+        dfWords.push(dfNewWord(parts[0],parts[1]));added++;
       } else skipped++;
     }
   });
   dfSave();dfUpdateStats();dfRenderList();
-  toast(`${added} kelime eklendi${skipped?' · '+skipped+' tekrar atlandı':''}!`,'ok');
+  toast(`${added} kelime eklendi${skipped?' ('+skipped+' tekrar atlandı)':''}!`,'ok');
 }
 
 function parseXLSX(arrayBuffer){
@@ -3081,9 +3069,7 @@ function dfShowCard(){
   if(dfRevIdx>=dfReviewQueue.length){dfRevFinish();return;}
   const w=dfReviewQueue[dfRevIdx];
   dfRevRevealed=false;
-  const flower=dfGetFlower(w.interval);
   document.getElementById('df-rev-prog').textContent=`${dfRevIdx+1} / ${dfReviewQueue.length}`;
-  document.getElementById('df-rev-label').innerHTML=`<span style="font-size:28px">${flower.emoji}</span><br><span style="color:${flower.color};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px">${flower.label}</span>`;
   document.getElementById('df-rev-word').textContent=w.word;
   document.getElementById('df-rev-meaning').textContent=w.meaning;
   document.getElementById('df-rev-answer').style.display='none';
@@ -3096,17 +3082,9 @@ function dfReveal(){
   dfRevRevealed=true;
   document.getElementById('df-rev-answer').style.display='block';
   document.getElementById('df-rev-hint').style.display='none';
-  document.getElementById('df-rev-btns').style.display='block';
+  const btns=document.getElementById('df-rev-btns');
+  btns.style.display='flex';
   speakWord(dfReviewQueue[dfRevIdx]?.word||'');
-}
-
-function dfGetFlower(interval){
-  if(!interval||interval<=1) return {emoji:'🌱',label:'Yeni',color:'var(--dim)'};
-  if(interval<=3)  return {emoji:'🌿',label:'Filiz',color:'var(--grn)'};
-  if(interval<=7)  return {emoji:'🌸',label:'Tomurcuk',color:'#f78fb3'};
-  if(interval<=14) return {emoji:'🌺',label:'Çiçek',color:'#ff6b9d'};
-  if(interval<=21) return {emoji:'🌻',label:'Açık',color:'var(--gold)'};
-  return {emoji:'💐',label:'Ustalaşıldı',color:'#9b7ff5'};
 }
 
 function dfRate(quality){
