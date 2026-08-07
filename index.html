@@ -429,9 +429,7 @@ a{color:var(--gold);text-decoration:none}
 #toast.er{border-left:3px solid var(--red)}
 #toast.in{border-left:3px solid var(--blue)}
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -454,15 +452,19 @@ a{color:var(--gold);text-decoration:none}
       <button class="tmopt" id="tm-navy" onclick="setTheme('t-navy')">🌊 Navy</button>
     </div>
     <button class="icbtn" onclick="openSettings()">⚙️</button>
-    <div id="user-area" style="display:flex;align-items:center;gap:6px">
-      <button id="login-btn" onclick="googleSignIn()" style="display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--sur2);border:1px solid var(--bor);border-radius:var(--r2);font-size:12.5px;color:var(--text);cursor:pointer;transition:all .18s;white-space:nowrap">
-        <svg width="13" height="13" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Giriş Yap
+    <div id="user-area" style="display:flex;align-items:center;gap:6px;position:relative">
+      <button id="login-btn" onclick="toggleLoginPop()" style="display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--sur2);border:1px solid var(--bor);border-radius:var(--r2);font-size:12.5px;color:var(--text);cursor:pointer;transition:all .18s;white-space:nowrap">
+        ✉️ Giriş Yap
       </button>
+      <div id="login-pop" style="display:none;position:absolute;top:40px;right:0;background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:14px;box-shadow:var(--sh);z-index:500;min-width:230px">
+        <div style="font-size:12.5px;color:var(--dim);margin-bottom:8px;line-height:1.5">E-postana giriş linki gönderelim, şifre yok.</div>
+        <input type="email" id="login-email" class="fi" placeholder="ornek@eposta.com" style="margin-bottom:8px;font-size:13px">
+        <button class="btnp" style="width:100%;padding:9px" onclick="sendMagicLink()">✉️ Link Gönder</button>
+      </div>
       <div id="user-info" style="display:none;align-items:center;gap:7px">
-        <img id="user-photo" style="width:28px;height:28px;border-radius:50%;border:2px solid var(--gold-border)" src="" alt="">
-        <span id="user-name" style="font-size:12.5px;color:var(--text);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-        <button onclick="googleSignOut()" style="font-size:11px;padding:4px 8px;background:var(--sur2);border:1px solid var(--bor);border-radius:6px;color:var(--dim);cursor:pointer">Çıkış</button>
+        <div id="user-avatar" style="width:26px;height:26px;border-radius:50%;background:var(--gd);border:1.5px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--gold);flex-shrink:0"></div>
+        <span id="user-name" style="font-size:12.5px;color:var(--text);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <button onclick="supaSignOut()" style="font-size:11px;padding:4px 8px;background:var(--sur2);border:1px solid var(--bor);border-radius:6px;color:var(--dim);cursor:pointer">Çıkış</button>
       </div>
     </div>
   </div>
@@ -964,19 +966,24 @@ a{color:var(--gold);text-decoration:none}
         <div class="wb"><div class="wbv" id="df-new">0</div><div class="wbl">Yeni</div></div>
       </div>
       <div>
-        <div style="font-size:11px;font-weight:600;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📥 Dosya Yükle</div>
-        <p style="font-size:12.5px;color:var(--dim);margin-bottom:10px;line-height:1.6">Google Sheets veya Excel (.xlsx, .csv). Sütunlar: <strong style="color:var(--text)">Kelime | Anlam</strong></p>
-        <label style="display:block;padding:14px;background:var(--sur2);border:1.5px dashed var(--bor);border-radius:var(--r2);text-align:center;font-size:13px;color:var(--dim);cursor:pointer;transition:all .18s" ondragover="dfDragOver(event)" ondrop="dfDrop(event)" onclick="document.getElementById('df-file-input').click()">
-          📂 Dosya seç veya sürükle
-          <input type="file" id="df-file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="dfFileSelected(this)">
-        </label>
-        <p style="font-size:11.5px;color:var(--dim2);margin-top:6px">İlk sütun kelime, ikinci sütun anlam.</p>
+        <div style="font-size:11px;font-weight:600;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🌱 Hazır Kelime Bankası</div>
+        <p style="font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.6">Sıfırdan başlama — sistemde hazır paketler var. Beğendiğini ekle, tohumdan çiçeğe kendi hızında büyüsün.</p>
+        <div id="df-packs" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
       <div>
         <div style="font-size:11px;font-weight:600;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">+ Manuel Ekle</div>
         <input type="text" class="fi" id="df-w" placeholder="Kelime" style="margin-bottom:6px">
         <input type="text" class="fi" id="df-m" placeholder="Anlam / Türkçe" style="margin-bottom:8px">
         <button class="btnp" style="width:100%" onclick="dfAddManual()">Ekle</button>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:var(--dim2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📥 Ekstra: Kendi Dosyanı Yükle</div>
+        <p style="font-size:12.5px;color:var(--dim);margin-bottom:10px;line-height:1.6">İstersen Excel/CSV yükle. Sütunlar: <strong style="color:var(--text)">Kelime | Anlam</strong></p>
+        <label style="display:block;padding:14px;background:var(--sur2);border:1.5px dashed var(--bor);border-radius:var(--r2);text-align:center;font-size:13px;color:var(--dim);cursor:pointer;transition:all .18s" ondragover="dfDragOver(event)" ondrop="dfDrop(event)" onclick="document.getElementById('df-file-input').click()">
+          📂 Dosya seç veya sürükle
+          <input type="file" id="df-file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="dfFileSelected(this)">
+        </label>
+        <p style="font-size:11.5px;color:var(--dim2);margin-top:6px">İlk sütun kelime, ikinci sütun anlam.</p>
       </div>
     </div>
     <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
@@ -1060,12 +1067,28 @@ a{color:var(--gold);text-decoration:none}
       <p style="font-size:12px;color:var(--dim);margin-top:5px">Birini seç, kaydet, test et. Beğenmezsen başkasını dene.</p>
     </div>
     <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bor)">
-      <label class="fl">☁️ Firebase Config <span style="color:var(--grn);font-size:11px;font-weight:600">BULUT SENKRONIZASYON</span></label>
-      <textarea class="fi fta" id="s-firebase" placeholder='Firebase projesinden aldığın config JSON: {"apiKey":"...","authDomain":"...","projectId":"..."}' style="min-height:80px;font-size:12px;font-family:monospace"></textarea>
-      <p style="font-size:12px;color:var(--dim);margin-top:5px;line-height:1.6">
-        <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → Proje oluştur → Proje Ayarları → Web uygulaması ekle → Config'i kopyala → buraya yapıştır.<br>
-        Firestore'da "users" koleksiyonu oluştur, Authentication'da Google'ı etkinleştir.
+      <label class="fl">☁️ Supabase <span style="color:var(--grn);font-size:11px;font-weight:600">BULUT SENKRONIZASYON</span></label>
+      <input type="text" class="fi" id="s-sb-url" placeholder="https://xxxxxxxx.supabase.co" style="margin-bottom:8px">
+      <input type="password" class="fi" id="s-sb-key" placeholder="anon / public key">
+      <p style="font-size:12px;color:var(--dim);margin-top:8px;line-height:1.6">
+        <a href="https://supabase.com/dashboard" target="_blank">supabase.com/dashboard</a> → Proje oluştur → Settings → API → Project URL ve <strong style="color:var(--text)">anon public</strong> key'i kopyala.<br>
+        Authentication → Providers → <strong style="color:var(--text)">Email</strong>'i açık bırak (Magic Link için yeterli, şifre gerekmez).<br>
+        SQL Editor'de bir kere çalıştır:
       </p>
+      <textarea class="fi fta" readonly onclick="this.select()" style="min-height:120px;font-size:11px;font-family:monospace;margin-top:6px">create table public.user_data (
+  user_id uuid references auth.users(id) primary key,
+  vocab jsonb default '[]',
+  alex jsonb default '{}',
+  reading jsonb default '{}',
+  learner_profile jsonb,
+  df_words jsonb default '[]',
+  keys jsonb default '{}',
+  updated_at timestamptz default now()
+);
+alter table public.user_data enable row level security;
+create policy "own select" on public.user_data for select using (auth.uid() = user_id);
+create policy "own insert" on public.user_data for insert with check (auth.uid() = user_id);
+create policy "own update" on public.user_data for update using (auth.uid() = user_id);</textarea>
     </div>
     <div class="macts">
       <button class="btns" onclick="closeSett()">Vazgeç</button>
@@ -1114,7 +1137,7 @@ function go(id){
   if(id==='reading')renderPList();
   if(id==='alex'){refreshAlexUI();updateNoKey();}
   if(id==='listening'){if(LS.dictShuffle.length===0)initDict();if(LS.shadShuffle.length===0)initShad();}
-  if(id==='defter'){dfUpdateStats();dfRenderList();}
+  if(id==='defter'){dfUpdateStats();dfRenderList();dfRenderPacks();}
 }
 
 // ═══════════ SETTINGS ═══════════
@@ -1123,8 +1146,8 @@ function openSettings(){
   document.getElementById('sel').value=S.keys.el||'';
   const sel=document.getElementById('svid');
   if(S.keys.voice) sel.value=S.keys.voice;
-  const fc=localStorage.getItem('ea_firebase_cfg')||'';
-  document.getElementById('s-firebase').value=fc;
+  document.getElementById('s-sb-url').value=localStorage.getItem('ea_sb_url')||'';
+  document.getElementById('s-sb-key').value=localStorage.getItem('ea_sb_key')||'';
   document.getElementById('sov').classList.add('open');
 }
 function closeSett(){document.getElementById('sov').classList.remove('open');}
@@ -1132,10 +1155,12 @@ function saveSett(){
   S.keys.groq=document.getElementById('sg').value.trim();
   S.keys.el=document.getElementById('sel').value.trim();
   S.keys.voice=document.getElementById('svid').value.trim();
-  const fbCfg=document.getElementById('s-firebase').value.trim();
-  if(fbCfg){
-    localStorage.setItem('ea_firebase_cfg',fbCfg);
-    initFirebase(fbCfg);
+  const sbUrl=document.getElementById('s-sb-url').value.trim();
+  const sbKey=document.getElementById('s-sb-key').value.trim();
+  if(sbUrl&&sbKey){
+    localStorage.setItem('ea_sb_url',sbUrl);
+    localStorage.setItem('ea_sb_key',sbKey);
+    initSupabase(sbUrl,sbKey);
   }
   save();closeSett();updateNoKey();
   if(S.keys.groq)document.getElementById('key-tip').style.display='none';
@@ -2895,6 +2920,101 @@ let dfRevSession={correct:0,total:0};
 function dfSave(){try{localStorage.setItem('ea_df',JSON.stringify(dfWords));}catch(e){}}
 function dfLoad(){try{const d=localStorage.getItem('ea_df');if(d)dfWords=JSON.parse(d);}catch(e){}}
 
+// ── HAZIR KELİME BANKASI (built-in seed packs) ──
+const WORD_PACKS={
+  a1:{label:'Temel Kelimeler',level:'A1',emoji:'🌱',words:[
+    ['house','ev'],['water','su'],['food','yemek'],['family','aile'],['friend','arkadaş'],
+    ['time','zaman'],['day','gün'],['night','gece'],['morning','sabah'],['evening','akşam'],
+    ['book','kitap'],['school','okul'],['work','iş'],['money','para'],['city','şehir'],
+    ['country','ülke'],['name','isim'],['age','yaş'],['color','renk'],['number','sayı'],
+    ['big','büyük'],['small','küçük'],['good','iyi'],['bad','kötü'],['happy','mutlu'],
+    ['sad','üzgün'],['hot','sıcak'],['cold','soğuk'],['new','yeni'],['old','eski'],
+    ['fast','hızlı'],['slow','yavaş'],['easy','kolay'],['difficult','zor'],['beautiful','güzel'],
+    ['ugly','çirkin'],['right','doğru'],['wrong','yanlış'],['open','açık'],['close','kapalı']
+  ]},
+  a2:{label:'Günlük Fiiller',level:'A2',emoji:'🌿',words:[
+    ['go','gitmek'],['come','gelmek'],['eat','yemek yemek'],['drink','içmek'],['sleep','uyumak'],
+    ['walk','yürümek'],['run','koşmak'],['speak','konuşmak'],['listen','dinlemek'],['read','okumak'],
+    ['write','yazmak'],['watch','izlemek'],['look','bakmak'],['give','vermek'],['take','almak'],
+    ['buy','satın almak'],['sell','satmak'],['make','yapmak'],['think','düşünmek'],['know','bilmek'],
+    ['understand','anlamak'],['learn','öğrenmek'],['teach','öğretmek'],['help','yardım etmek'],['need','ihtiyaç duymak'],
+    ['want','istemek'],['like','hoşlanmak'],['love','sevmek'],['remember','hatırlamak'],['forget','unutmak'],
+    ['start','başlamak'],['finish','bitirmek'],['stay','kalmak'],['leave','ayrılmak'],['arrive','varmak'],
+    ['wait','beklemek'],['meet','buluşmak']
+  ]},
+  b1:{label:'Sık Kullanılan Sıfatlar',level:'B1',emoji:'🌸',words:[
+    ['important','önemli'],['interesting','ilginç'],['boring','sıkıcı'],['exciting','heyecan verici'],['dangerous','tehlikeli'],
+    ['safe','güvenli'],['expensive','pahalı'],['cheap','ucuz'],['strong','güçlü'],['weak','zayıf'],
+    ['healthy','sağlıklı'],['tired','yorgun'],['hungry','aç'],['thirsty','susamış'],['comfortable','rahat'],
+    ['crowded','kalabalık'],['empty','boş'],['clean','temiz'],['dirty','kirli'],['careful','dikkatli'],
+    ['honest','dürüst'],['polite','kibar'],['rude','kaba'],['friendly','arkadaş canlısı'],['shy','utangaç'],
+    ['confident','kendinden emin'],['nervous','gergin'],['calm','sakin'],['angry','kızgın'],['worried','endişeli'],
+    ['surprised','şaşırmış'],['confused','kafası karışık'],['proud','gururlu'],['generous','cömert'],['lazy','tembel'],
+    ['stubborn','inatçı']
+  ]},
+  b2:{label:'İş İngilizcesi',level:'B2',emoji:'🌺',words:[
+    ['meeting','toplantı'],['deadline','son teslim tarihi'],['project','proje'],['budget','bütçe'],['client','müşteri'],
+    ['colleague','iş arkadaşı'],['manager','yönetici'],['employee','çalışan'],['salary','maaş'],['contract','sözleşme'],
+    ['negotiate','müzakere etmek'],['decision','karar'],['strategy','strateji'],['report','rapor'],['presentation','sunum'],
+    ['schedule','program'],['task','görev'],['goal','hedef'],['achievement','başarı'],['promotion','terfi'],
+    ['resign','istifa etmek'],['interview','mülakat'],['resume','özgeçmiş'],['experience','deneyim'],['responsibility','sorumluluk'],
+    ['teamwork','ekip çalışması'],['feedback','geri bildirim'],['deal','anlaşma'],['invoice','fatura'],['qualification','yeterlilik']
+  ]},
+  trv:{label:'Seyahat Kelimeleri',level:'B1',emoji:'🌻',words:[
+    ['airport','havalimanı'],['passport','pasaport'],['ticket','bilet'],['luggage','bagaj'],['flight','uçuş'],
+    ['delay','gecikme'],['boarding','biniş'],['customs','gümrük'],['hotel','otel'],['reservation','rezervasyon'],
+    ['reception','resepsiyon'],['currency','para birimi'],['exchange','döviz bozdurma'],['map','harita'],['tourist','turist'],
+    ['guide','rehber'],['souvenir','hediyelik eşya'],['journey','yolculuk'],['destination','varış noktası'],['itinerary','seyahat planı'],
+    ['departure','kalkış'],['arrival','varış'],['gate','kapı (uçuş)'],['visa','vize'],['embassy','büyükelçilik']
+  ]},
+  c1:{label:'Akademik Kelimeler',level:'C1',emoji:'💐',words:[
+    ['analyze','analiz etmek'],['evaluate','değerlendirmek'],['hypothesis','hipotez'],['research','araştırma'],['evidence','kanıt'],
+    ['theory','teori'],['concept','kavram'],['methodology','metodoloji'],['significant','önemli/anlamlı'],['consequently','sonuç olarak'],
+    ['furthermore','ayrıca'],['nevertheless','yine de'],['subsequently','daha sonra'],['contradict','çelişmek'],['emphasize','vurgulamak'],
+    ['demonstrate','göstermek/kanıtlamak'],['imply','ima etmek'],['assume','varsaymak'],['perspective','bakış açısı'],['criterion','kriter'],
+    ['phenomenon','olgu'],['framework','çerçeve'],['correlation','ilişki/korelasyon'],['comprehensive','kapsamlı'],['ambiguous','belirsiz'],
+    ['coherent','tutarlı'],['plausible','makul/inandırıcı'],['arbitrary','keyfi'],['inevitable','kaçınılmaz'],['sufficient','yeterli']
+  ]}
+};
+
+function dfPackAddedCount(id){
+  const words=WORD_PACKS[id].words;
+  const set=new Set(dfWords.map(w=>w.word.toLowerCase()));
+  return words.filter(([w])=>set.has(w.toLowerCase())).length;
+}
+
+function dfRenderPacks(){
+  const box=document.getElementById('df-packs');
+  if(!box)return;
+  box.innerHTML=Object.entries(WORD_PACKS).map(([id,pack])=>{
+    const total=pack.words.length;
+    const added=dfPackAddedCount(id);
+    const done=added>=total;
+    return`<div style="background:var(--sur2);border:1px solid var(--bor);border-radius:var(--r2);padding:11px 12px;display:flex;align-items:center;gap:10px">
+      <div style="font-size:20px;flex-shrink:0">${pack.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:500">${pack.label}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:1px">${pack.level} · ${added}/${total} eklendi</div>
+      </div>
+      <button onclick="dfAddPack('${id}')" ${done?'disabled':''} style="flex-shrink:0;padding:6px 11px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid ${done?'var(--bor)':'var(--gb)'};background:${done?'var(--sur3)':'var(--gd)'};color:${done?'var(--dim)':'var(--gold)'};cursor:${done?'default':'pointer'}">${done?'✓ Tamam':'+ Ekle'}</button>
+    </div>`;
+  }).join('');
+}
+
+function dfAddPack(id){
+  const pack=WORD_PACKS[id];
+  if(!pack)return;
+  let added=0;
+  pack.words.forEach(([w,m])=>{
+    if(!dfWords.find(x=>x.word.toLowerCase()===w.toLowerCase())){
+      dfWords.push(dfNewWord(w,m));added++;
+    }
+  });
+  dfSave();dfUpdateStats();dfRenderList();dfRenderPacks();
+  if(added>0)toast(`"${pack.label}" paketinden ${added} kelime eklendi 🌱`,'ok');
+  else toast('Bu paketteki tüm kelimeler zaten defterinde','in');
+}
+
 function dfNewWord(word,meaning){
   return{id:Date.now()+Math.random(),word:word.trim(),meaning:meaning.trim(),
     ef:2.5,interval:1,repetitions:0,due:Date.now(),lastReview:null};
@@ -3133,30 +3253,36 @@ function showDfList(){
   dfRenderList();
 }
 
-// ═══════════ FIREBASE / CLOUD SYNC ═══════════
-let fbApp=null,fbAuth=null,fbDb=null,fbUser=null;
+// ═══════════ SUPABASE / CLOUD SYNC ═══════════
+let sbClient=null,sbUser=null;
 let syncTimeout=null;
 
-function initFirebase(configStr){
+function initSupabase(url,anonKey){
   try{
-    const cfg=typeof configStr==='string'?JSON.parse(configStr):configStr;
-    if(!cfg.apiKey)return;
-    if(typeof firebase==='undefined'){console.warn('Firebase SDK not loaded');return;}
-    if(firebase.apps.length){fbApp=firebase.apps[0];}
-    else{fbApp=firebase.initializeApp(cfg);}
-    fbAuth=firebase.auth();
-    fbDb=firebase.firestore();
-    fbAuth.onAuthStateChanged(user=>{
-      fbUser=user;
-      if(user){
-        updateUserUI(user);
-        loadFromCloud();
-      } else {
-        updateUserUI(null);
-      }
+    if(!url||!anonKey)return;
+    if(typeof supabase==='undefined'){console.warn('Supabase SDK not loaded');return;}
+    sbClient=supabase.createClient(url,anonKey);
+    sbClient.auth.onAuthStateChange((event,session)=>{
+      sbUser=session?.user||null;
+      if(sbUser){updateUserUI(sbUser);loadFromCloud();}
+      else updateUserUI(null);
     });
-  }catch(e){console.warn('Firebase init error:',e.message);}
+    sbClient.auth.getSession().then(({data})=>{
+      sbUser=data?.session?.user||null;
+      if(sbUser){updateUserUI(sbUser);loadFromCloud();}
+    });
+  }catch(e){console.warn('Supabase init error:',e.message);}
 }
+
+function toggleLoginPop(){
+  if(sbUser)return;
+  const p=document.getElementById('login-pop');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',e=>{
+  const p=document.getElementById('login-pop');const b=document.getElementById('login-btn');
+  if(p&&b&&!p.contains(e.target)&&!b.contains(e.target))p.style.display='none';
+});
 
 function updateUserUI(user){
   const loginBtn=document.getElementById('login-btn');
@@ -3165,68 +3291,73 @@ function updateUserUI(user){
   if(user){
     loginBtn.style.display='none';
     userInfo.style.display='flex';
-    document.getElementById('user-photo').src=user.photoURL||'';
-    document.getElementById('user-name').textContent=user.displayName||user.email||'';
-    document.getElementById('user-photo').style.display=user.photoURL?'block':'none';
+    const email=user.email||'';
+    document.getElementById('user-avatar').textContent=email.charAt(0).toUpperCase();
+    document.getElementById('user-name').textContent=email;
   } else {
     loginBtn.style.display='flex';
     userInfo.style.display='none';
   }
 }
 
-async function googleSignIn(){
-  if(!fbAuth){toast('Önce Firebase config ekle (⚙️ Ayarlar)','er');return;}
+async function sendMagicLink(){
+  const email=document.getElementById('login-email').value.trim();
+  if(!email){toast('E-posta gir','er');return;}
+  if(!sbClient){toast('Önce Supabase ayarlarını gir (⚙️ Ayarlar)','er');return;}
   try{
-    const provider=new firebase.auth.GoogleAuthProvider();
-    await fbAuth.signInWithPopup(provider);
-    toast('Giriş başarılı! Veriler yükleniyor...','ok');
-  }catch(e){toast('Giriş hatası: '+e.message,'er');}
+    const{error}=await sbClient.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
+    if(error)throw error;
+    document.getElementById('login-pop').style.display='none';
+    toast('✓ Giriş linki e-postana gönderildi, kontrol et','ok');
+  }catch(e){toast('Hata: '+e.message,'er');}
 }
 
-async function googleSignOut(){
-  if(!fbAuth)return;
+async function supaSignOut(){
+  if(!sbClient)return;
   if(!confirm('Çıkış yapmak istediğine emin misin?'))return;
-  await fbAuth.signOut();
+  await sbClient.auth.signOut();
   toast('Çıkış yapıldı','in');
 }
 
 async function saveToCloud(){
-  if(!fbDb||!fbUser)return;
+  if(!sbClient||!sbUser)return;
   clearTimeout(syncTimeout);
   syncTimeout=setTimeout(async()=>{
     try{
-      await fbDb.collection('users').doc(fbUser.uid).set({
+      const{error}=await sbClient.from('user_data').upsert({
+        user_id:sbUser.id,
         vocab:S.vocab,
         alex:S.alex,
         reading:S.reading,
-        learnerProfile:S.learnerProfile||null,
-        dfWords:dfWords,
+        learner_profile:S.learnerProfile||null,
+        df_words:dfWords,
         keys:{groq:S.keys.groq,el:S.keys.el,voice:S.keys.voice},
-        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-      },{merge:true});
+        updated_at:new Date().toISOString()
+      });
+      if(error)throw error;
       showSyncIcon(true);
     }catch(e){console.warn('Cloud save error:',e);showSyncIcon(false);}
   },1500);
 }
 
 async function loadFromCloud(){
-  if(!fbDb||!fbUser)return;
+  if(!sbClient||!sbUser)return;
   try{
-    const doc=await fbDb.collection('users').doc(fbUser.uid).get();
-    if(!doc.exists){toast('Bulut verisi bulunamadı, yerel veriler korunuyor','in');return;}
-    const d=doc.data();
+    const{data:d,error}=await sbClient.from('user_data').select('*').eq('user_id',sbUser.id).maybeSingle();
+    if(error)throw error;
+    if(!d){toast('Bulut verisi bulunamadı, yerel veriler korunuyor','in');return;}
     if(d.vocab&&d.vocab.length>0) S.vocab=d.vocab;
     if(d.alex) S.alex={...S.alex,...d.alex};
     if(d.reading) S.reading={...S.reading,...d.reading};
-    if(d.learnerProfile) S.learnerProfile=d.learnerProfile;
-    if(d.dfWords&&d.dfWords.length>0) dfWords=d.dfWords;
+    if(d.learner_profile) S.learnerProfile=d.learner_profile;
+    if(d.df_words&&d.df_words.length>0) dfWords=d.df_words;
     if(d.keys){
       if(d.keys.groq) S.keys.groq=d.keys.groq;
       if(d.keys.el) S.keys.el=d.keys.el;
       if(d.keys.voice) S.keys.voice=d.keys.voice;
     }
     save();dfSave();
-    renderVL();refreshAlexUI();refreshHub();dfUpdateStats();dfRenderList();
+    renderVL();refreshAlexUI();refreshHub();dfUpdateStats();dfRenderList();dfRenderPacks();
     if(S.keys.groq) document.getElementById('key-tip').style.display='none';
     updateNoKey();
     toast('✓ Bulut verileri yüklendi','ok');
@@ -3249,12 +3380,12 @@ function showSyncIcon(ok){
 const _origSave=save;
 function save(){
   _origSave();
-  if(fbUser) saveToCloud();
+  if(sbUser) saveToCloud();
 }
 const _origDfSave=dfSave;
 function dfSave(){
   _origDfSave();
-  if(fbUser) saveToCloud();
+  if(sbUser) saveToCloud();
 }
 
 // ═══════════ THEMES ═══════════
@@ -3279,9 +3410,11 @@ document.addEventListener('click',e=>{
 load();
 loadAnnotations();
 dfLoad();
-// Init Firebase if config saved
-const _fbCfg=localStorage.getItem('ea_firebase_cfg');
-if(_fbCfg) setTimeout(()=>initFirebase(_fbCfg),800);
+dfRenderPacks();
+// Init Supabase if config saved
+const _sbUrl=localStorage.getItem('ea_sb_url');
+const _sbKey=localStorage.getItem('ea_sb_key');
+if(_sbUrl&&_sbKey) setTimeout(()=>initSupabase(_sbUrl,_sbKey),800);
 // Hide mic initially (only shown on Alex)
 const _fm=document.getElementById('float-mic');
 if(_fm)_fm.style.display='none';
